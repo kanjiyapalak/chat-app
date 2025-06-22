@@ -1,0 +1,250 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f0f2f5 0%, #e6e9f0 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.home-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.home-header h1 {
+    color: #1a1a1a;
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+.home-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.room-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.room-option {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.room-option:hover {
+    transform: translateY(-5px);
+    border-color: #4990e2;
+}
+
+.room-option h3 {
+    color: #1a1a1a;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.room-option p {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Room Code Display and Join Room Form Styles */
+.room-code {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin: 2rem auto;
+    max-width: 500px;
+    animation: slideDown 0.3s ease;
+}
+
+.room-code h3 {
+    color: #1a1a1a;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Room Code Display Specific Styles */
+#roomCodeDisplay {
+    text-align: center;
+}
+
+#roomCodeDisplay p {
+    font-family: 'Courier New', monospace;
+    font-size: 1.8rem;
+    color: #1a1a1a;
+    font-weight: bold;
+    letter-spacing: 2px;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 200px;
+    margin: 1rem 0;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+#roomCodeDisplay p:hover {
+    border-color: #4990e2;
+    transform: translateY(-2px);
+}
+
+/* Join Room Form Specific Styles */
+#joinRoomForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#joinRoomForm input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#joinRoomForm input:focus {
+    outline: none;
+    border-color: #4990e2;
+    box-shadow: 0 0 0 3px rgba(73, 144, 226, 0.1);
+}
+
+#joinRoomForm input::placeholder {
+    color: #adb5bd;
+}
+
+/* Common Button Styles */
+.room-code .btn {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #4990e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.room-code .btn:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+}
+
+.room-code .btn:active {
+    transform: translateY(0);
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .room-code {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .room-code h3 {
+        font-size: 1.4rem;
+    }
+
+    #roomCodeDisplay p {
+        font-size: 1.4rem;
+        min-width: 160px;
+        padding: 0.8rem;
+    }
+
+    #joinRoomForm input {
+        padding: 0.7rem;
+        font-size: 0.95rem;
+    }
+
+    .room-code .btn {
+        padding: 0.7rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .home-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .room-options {
+        grid-template-columns: 1fr;
+    }
+
+    .room-option {
+        padding: 1.5rem;
+    }
+
+    .room-code {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .room-code h3 {
+        font-size: 1.4rem;
+    }
+
+    #roomCodeDisplay p {
+        font-size: 1.4rem;
+        min-width: 160px;
+        padding: 0.8rem;
+    }
+
+    #joinRoomForm input {
+        padding: 0.7rem;
+        font-size: 0.95rem;
+    }
+
+    .room-code .btn {
+        padding: 0.7rem;
+        font-size: 0.95rem;
+    }
+} 

@@ -1,52 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CodTech Chat App</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Chat App</title>
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
-  <!-- Join Page -->
- <div id="join-container" class="chat-container">
-  <header class="chat-header"><h1>Join Chat Room</h1></header>
-  <form id="create-form" class="chat-form">
-    
-    <input id="create-username" type="text" placeholder="Your name to create room" required />
-    <button type="submit">Create Room</button>
-  </form>
-  <hr />
-  <form id="join-form" class="chat-form">
-    <input id="username" type="text" placeholder="Enter your name" required />
-    <input id="room-code" type="text" placeholder="Enter room code" required />
-    <button type="submit">Join Room</button>
-  </form>
-</div>
-
-
-<!-- Chat Page -->
-<div id="chat-container" class="chat-container">
- 
-  <main class="chat-main">
-    <div class="chat-sidebar">
-  <button id="toggle-participants">Show Participants</button>
-  <div id="participants-container" class="hidden">
-    <ul id="participants" class="chat-participants"></ul>
-  </div>
-</div>
-
-    <ul id="messages" class="chat-messages"></ul>
-  </main>
-  <form id="chat-form" class="chat-form">
-    <div class="send-message">
-      <input id="m" type="text" placeholder="Type your message..." autocomplete="off" required />
-      <button type="submit">Send</button>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <p class="auth-link">Don't have an account? <a href="signup.html">Sign up</a></p>
+        </div>
     </div>
-  </form>
-</div>
-
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="script.js"></script>
+    <script src="auth.js"></script>
 </body>
-</html>
+</html> 

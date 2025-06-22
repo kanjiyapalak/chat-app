@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Participants</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="participants-container">
+        <header class="chat-header">
+            <button class="back-button" onclick="goBackToChat()">← Back to Chat</button>
+            <h2>Room Participants</h2>
+        </header>
+        
+        <div class="participants-list" id="participantsList">
+            <!-- Participants will be added here dynamically -->
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="participants.js"></script>
+</body>
+</html> 

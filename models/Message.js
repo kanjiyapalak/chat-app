@@ -1,10 +1,22 @@
 const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
-  username: String,
-  room: String,
-  text: String,
-  time: { type: Date, default: Date.now }
+  roomId: {
+    type: String,
+    required: true
+  },
+  sender: {
+    type: String,
+    required: true
+  },
+  content: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model("Message", messageSchema);

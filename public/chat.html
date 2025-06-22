@@ -1,21 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CodTech Chat</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="chat.css">
 </head>
 <body>
-  <div class="container">
-    <h2> Chat</h2>
-    <div id="chat-box"></div>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <button class="back-btn" onclick="window.location.href='home.html'">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1 id="roomTitle">Chat Room</h1>
+        </div>
+        <div class="navbar-right">
+            <button class="leave-btn" onclick="leaveRoom()">
+                <i class="fas fa-sign-out-alt"></i>
+                Leave Room
+            </button>
+            <button class="leave-btn" onclick="showParticipants()">
+                <i class="fas fa-users"></i>
+                Participants
+            </button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <button class="hamburger" id="hamburgerBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <button onclick="logout()">Logout</button>
+                <button onclick="leaveRoom()">Leave Room</button>
+                <button onclick="showParticipants()">Participants</button>
+            </div>
+        </div>
+    </nav>
 
-    <div class="send-container">
-      <input type="text" id="messageInput" placeholder="Type your message">
-      <button id="sendBtn">Send</button>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <!-- <div class="participants">
+            <!-- <h3>Participants</h3>
+            <ul id="participantsList"></ul> -->
+        </div> -->
     </div>
-  </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="script.js"></script>
+    <div class="message-input">
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="chat.js"></script>
 </body>
 </html>

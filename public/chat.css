@@ -1,0 +1,326 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.navbar {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #1a1a1a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.navbar h1 {
+    font-size: 1.5rem;
+    color: #1a1a1a;
+}
+
+.back-btn, .leave-btn {
+    background-color: transparent;
+    border: none;
+    color: #1a1a1a;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.back-btn:hover, .leave-btn:hover {
+    color: #4a90e2;
+}
+
+.back-btn i, .leave-btn i {
+    font-size: 1.2rem;
+}
+
+.chat-container {
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 1rem auto;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 0;
+}
+
+.message {
+    max-width: 70%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message.sent {
+    background-color: #e3f2fd;
+    color: #1a1a1a;
+    align-self: flex-end;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+
+.message.received {
+    background-color: #f5f5f5;
+    color: #1a1a1a;
+    align-self: flex-start;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+}
+
+.message.system {
+    background-color: #fff3e0;
+    color: #1a1a1a;
+    align-self: center;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.message strong {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    color: #4a90e2;
+}
+
+.message p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.message-input {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-top: 1px solid #eee;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.message-input input {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.message-input input:focus {
+    border-color: #4a90e2;
+}
+
+.message-input button {
+    padding: 0.8rem 1.5rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+}
+
+.message-input button:hover {
+    background-color: #357abd;
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        margin: 0.5rem;
+        border-radius: 8px;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
+    .navbar {
+        padding: 0.8rem 1rem;
+    }
+
+    .back-btn, .leave-btn {
+        padding: 0.4rem;
+        font-size: 0.9rem;
+    }
+}
+
+.participants {
+    width: 250px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-left: 1px solid #dee2e6;
+    overflow-y: auto;
+}
+
+.participants h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.participants ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.participants li {
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.participants li.current-user {
+    background-color: #e3f2fd;
+    border-left: 4px solid #007bff;
+    font-weight: bold;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.message .sender {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.message .time {
+    font-size: 0.85em;
+    color: #888;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.message.sent .time {
+    color: #1a1a1a;
+}
+
+.navbar-right {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.logout-btn {
+    padding: 8px 15px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+}
+
+.message-content-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Hide dropdown and hamburger by default */
+.hamburger, .dropdown-menu {
+  display: none;
+}
+
+/* Responsive styles for <= 680px */
+@media (max-width: 680px) {
+  .navbar-right > .leave-btn,
+  .navbar-right > .logout-btn,
+  .navbar-right > .participants-btn {
+    display: none; /* Hide regular buttons on small screens */
+  }
+  .hamburger {
+    display: inline-flex;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    align-items: center;
+    margin-left: 1rem;
+    color: #1a1a1a; /* Ensure hamburger icon is visible */
+  }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 1rem;
+    top: 60px; /* Adjust based on your navbar height */
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    flex-direction: column;
+    min-width: 150px;
+    z-index: 1001;
+    overflow: hidden; /* Ensures rounded corners */
+  }
+  .dropdown-menu.show {
+    display: flex;
+  }
+  .dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 1rem;
+    text-align: left;
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #1a1a1a; /* Ensure text is visible */
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+  }
+  .dropdown-menu button:last-child {
+    border-bottom: none;
+  }
+  .dropdown-menu button:hover {
+    background-color: #f0f0f0;
+  }
+} 

@@ -3,84 +3,309 @@ const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const User = require('./models/User');
+const Message = require('./models/Message');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 app.use(express.static(path.join(__dirname, "public")));
 
-const rooms = {};
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
 
-function updateParticipants(roomCode) {
-  const userList = rooms[roomCode]?.users || [];
-  io.to(roomCode).emit("updateParticipants", userList);
-}
-
-io.on("connection", (socket) => {
-  console.log("New connection");
-
-  // Create a room
-  socket.on("createRoom", (username) => {
-    const roomCode = uuidv4().slice(0, 6);
-    rooms[roomCode] = { users: [username] };
-
-    socket.join(roomCode);
-    socket.username = username;
-    socket.room = roomCode;
-
-    socket.emit("roomCreated", roomCode);
-    io.to(roomCode).emit("message", {
-      username: "",
-      text: `${username} created and joined the room.`,
-    });
-    updateParticipants(roomCode);
-  });
-
-  // Join an existing room
-  socket.on("joinRoom", ({ username, roomCode }) => {
-    if (rooms[roomCode]) {
-      rooms[roomCode].users.push(username);
-
-      socket.join(roomCode);
-      socket.username = username;
-      socket.room = roomCode;
-
-      socket.emit("joinedRoom", roomCode);
-      io.to(roomCode).emit("message", {
-        username: "",
-        text: `${username} has joined the room.`,
-      });
-      updateParticipants(roomCode);
-    } else {
-      socket.emit("errorMessage", "Room not found.");
-    }
-  });
-
-  // Chat message
-  socket.on("chatMessage", (msg) => {
-    io.to(socket.room).emit("message", {
-      username: socket.username,
-      text: msg,
-    });
-  });
-
-  // Disconnect
-  socket.on("disconnect", () => {
-    if (socket.username && socket.room) {
-      const room = rooms[socket.room];
-      if (room) {
-        room.users = room.users.filter((user) => user !== socket.username);
-        io.to(socket.room).emit("message", {
-          username: "",
-          text: `${socket.username} has left the chat.`,
-        });
-        updateParticipants(socket.room);
-      }
-    }
-  });
+// MongoDB connection
+mongoose.connect('mongodb://localhost:27017/chat-app', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
 
-const PORT = process.env.PORT || 3000;
+// JWT Secret
+const JWT_SECRET = 'your-secret-key'; // In production, use environment variable
+
+// Authentication middleware
+const auth = async (req, res, next) => {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '');
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await User.findOne({ _id: decoded.userId });
+        
+        if (!user) {
+            throw new Error();
+        }
+
+        req.token = token;
+        req.user = user;
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Please authenticate' });
+    }
+};
+
+// Check authentication middleware for HTML pages
+const checkAuth = (req, res, next) => {
+    const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.redirect('/login.html');
+    }
+    try {
+        jwt.verify(token, JWT_SECRET);
+        next();
+    } catch (error) {
+        res.redirect('/login.html');
+    }
+};
+
+// Routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/signup.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
+
+// Protected routes
+app.get('/index.html', checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/chat.html', checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+});
+
+app.get('/participants.html', checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'participants.html'));
+});
+
+app.post('/api/auth/signup', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+        
+        // Check if user already exists
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
+        const user = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        await user.save();
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating user' });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // Find user
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Check password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate token
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+        
+        // Set token in cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+        
+        res.json({ token, username: user.username });
+    } catch (error) {
+        res.status(500).json({ message: 'Error logging in' });
+    }
+});
+
+app.post('/api/rooms/create', auth, async (req, res) => {
+    try {
+        const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        res.json({ roomCode });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating room' });
+    }
+});
+
+app.post('/api/rooms/join', auth, async (req, res) => {
+    try {
+        const { roomCode } = req.body;
+        // In a real app, you might want to validate the room exists
+        res.json({ message: 'Joined room successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error joining room' });
+    }
+});
+
+// Logout route
+app.post('/api/auth/logout', (req, res) => {
+    res.clearCookie('token');
+    res.json({ message: 'Logged out successfully' });
+});
+
+// Socket.IO connection handling
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+        return next(new Error('Authentication error'));
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        socket.userId = decoded.userId;
+        socket.username = socket.handshake.auth.username;
+        next();
+    } catch (error) {
+        next(new Error('Authentication error'));
+    }
+});
+
+// Store active rooms and their users
+const rooms = new Map();
+// Track disconnect timeouts for users
+const disconnectTimeouts = new Map();
+
+io.on("connection", (socket) => {
+    console.log("New connection");
+
+    // Get participants list
+    socket.on('getParticipants', ({ roomCode }) => {
+        if (rooms.has(roomCode)) {
+            const participants = Array.from(rooms.get(roomCode));
+            socket.emit('participantsList', participants);
+        }
+    });
+
+    // Join an existing room
+    socket.on("joinRoom", async ({ roomCode, username }) => {
+        try {
+            // Cancel any pending disconnect removal for this user
+            const disconnectKey = `${roomCode}:${username}`;
+            if (disconnectTimeouts.has(disconnectKey)) {
+                clearTimeout(disconnectTimeouts.get(disconnectKey));
+                disconnectTimeouts.delete(disconnectKey);
+            }
+
+            // Join socket room
+            socket.join(roomCode);
+            socket.room = roomCode;
+            socket.username = username;
+            
+            // Add user to room
+            if (!rooms.has(roomCode)) {
+                rooms.set(roomCode, new Set());
+            }
+            rooms.get(roomCode).add(username);
+
+            // Get room history
+            const messages = await Message.find({ roomId: roomCode })
+                .sort({ timestamp: 1 })
+                .limit(50);
+            
+            socket.emit('roomHistory', messages);
+            
+            // Notify others
+            socket.to(roomCode).emit('userJoined', username);
+            
+            // Send updated participants list to all users in the room
+            const participants = Array.from(rooms.get(roomCode));
+            io.to(roomCode).emit('participantsList', participants);
+        } catch (error) {
+            socket.emit('error', { message: 'Error joining room' });
+        }
+    });
+
+    // Chat message
+    socket.on("sendMessage", async ({ content, roomCode }) => {
+        try {
+            const message = new Message({
+                roomId: roomCode,
+                sender: socket.username,
+                content,
+                timestamp: new Date()
+            });
+
+            await message.save();
+            
+            io.to(roomCode).emit('message', message);
+        } catch (error) {
+            socket.emit('error', { message: 'Error sending message' });
+        }
+    });
+
+    // Leave room
+    socket.on("leaveRoom", ({ roomCode }) => {
+        if (rooms.has(roomCode)) {
+            rooms.get(roomCode).delete(socket.username);
+            if (rooms.get(roomCode).size === 0) {
+                rooms.delete(roomCode);
+            } else {
+                // Send updated participants list to remaining users
+                const participants = Array.from(rooms.get(roomCode));
+                io.to(roomCode).emit('participantsList', participants);
+            }
+        }
+        
+        socket.leave(roomCode);
+        socket.to(roomCode).emit('userLeft', socket.username);
+        socket.emit('roomLeft');
+    });
+
+    // Handle disconnection
+    socket.on("disconnect", () => {
+        if (socket.room && socket.username) {
+            const roomCode = socket.room;
+            const username = socket.username;
+            const disconnectKey = `${roomCode}:${username}`;
+            // Wait 5 seconds before removing the user from the room
+            const timeout = setTimeout(() => {
+                if (rooms.has(roomCode)) {
+                    rooms.get(roomCode).delete(username);
+                    if (rooms.get(roomCode).size === 0) {
+                        rooms.delete(roomCode);
+                    } else {
+                        // Send updated participants list to remaining users
+                        const participants = Array.from(rooms.get(roomCode));
+                        io.to(roomCode).emit('participantsList', participants);
+                    }
+                }
+                io.to(roomCode).emit('userLeft', username);
+                disconnectTimeouts.delete(disconnectKey);
+            }, 5000); // 5 seconds
+            disconnectTimeouts.set(disconnectKey, timeout);
+        }
+    });
+});
+
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () =>
   console.log(`Server running at http://localhost:${PORT}`)
 );

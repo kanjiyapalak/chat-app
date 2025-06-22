@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat App - Home</title>
+  <link rel="stylesheet" href="home.css" />
+</head>
+<body>
+  <div class="room-container">
+    <h1>Welcome to Chat App</h1>
+    <div class="room-options">
+      <div class="room-option" id="createRoom">
+        <h3>Create New Room</h3>
+        <p>Start a new chat room and invite others</p>
+      </div>
+      <div class="room-option" id="joinRoom">
+        <h3>Join Existing Room</h3>
+        <p>Enter a room code to join</p>
+      </div>
+    </div>
+    <div id="roomCodeDisplay" class="room-code" style="display: none;">
+      <h3>Your Room Code</h3>
+      <p id="roomCode"></p>
+      <button class="btn" onclick="copyRoomCode()">Copy Code</button>
+    </div>
+    <div id="joinRoomForm" class="room-code" style="display: none;">
+      <h3>Enter Room Code</h3>
+      <input type="text" id="roomCodeInput" placeholder="Enter room code">
+      <button class="btn" onclick="joinRoom()">Join Room</button>
+    </div>
+  </div>
+  <script src="room.js"></script>
+</body>
+</html>
