@@ -21,6 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // MongoDB connection
+mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://localhost:27017/chat-app', {
     useNewUrlParser: true,
     useUnifiedTopology: true
