@@ -48,13 +48,15 @@ function copyRoomCode() {
 }
 
 async function joinRoom() {
-    const roomCode = document.getElementById('roomCodeInput').value;
+    let roomCode = document.getElementById('roomCodeInput').value;
     const token = localStorage.getItem('token');
 
     if (!roomCode) {
         alert('Please enter a room code');
         return;
     }
+
+    roomCode = roomCode.trim().toUpperCase();
 
     try {
         const response = await fetch('/api/rooms/join', {

@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const User = require('./models/User');
 const Message = require('./models/Message');
+const Room = require('./models/Room');
 
 const app = express();
 const server = http.createServer(app);
@@ -148,19 +149,43 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/rooms/create', auth, async (req, res) => {
     try {
-        const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-        res.json({ roomCode });
+        // Generate a unique room code and ensure no collision
+        let roomCode;
+        for (let i = 0; i < 5; i++) {
+            roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const exists = await Room.findOne({ roomCode });
+            if (!exists) break;
+            roomCode = undefined;
+        }
+        if (!roomCode) {
+            return res.status(500).json({ message: 'Failed to generate unique room code' });
+        }
+
+        const room = new Room({ roomCode, createdBy: req.user._id });
+        await room.save();
+        res.json({ roomCode, roomId: room._id });
     } catch (error) {
+        console.error('Create room error:', error);
         res.status(500).json({ message: 'Error creating room' });
     }
 });
 
 app.post('/api/rooms/join', auth, async (req, res) => {
     try {
-        const { roomCode } = req.body;
-        // In a real app, you might want to validate the room exists
-        res.json({ message: 'Joined room successfully' });
+        let { roomCode } = req.body;
+        if (!roomCode || typeof roomCode !== 'string') {
+            return res.status(400).json({ message: 'Room code is required' });
+        }
+        roomCode = roomCode.trim().toUpperCase();
+
+        const room = await Room.findOne({ roomCode });
+        if (!room) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+
+        res.json({ message: 'Joined room successfully', roomCode, roomId: room._id });
     } catch (error) {
+        console.error('Join room error:', error);
         res.status(500).json({ message: 'Error joining room' });
     }
 });
